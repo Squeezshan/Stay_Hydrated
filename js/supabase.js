@@ -75,8 +75,8 @@
    -- (repeat for each table)
    ═══════════════════════════════════════════════════════ */
 
-const SUPABASE_URL      = 'https://gjqqpgtuxumvswngoywh.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqcXFwZ3R1eHVtdnN3bmdveXdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5ODgwMjAsImV4cCI6MjA5NjU2NDAyMH0.nsZtpDeGPtj-nNMVb3PutiAgKqEiwEHcsrR_6YTwXW4';
+const SUPABASE_URL      = '';
+const SUPABASE_ANON_KEY = '';
 
 const DB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
