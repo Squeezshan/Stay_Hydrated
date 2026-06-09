@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stay Hydrated, Baby 💧</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- BUBBLES BACKGROUND -->
+  <div class="bubbles" id="bubbles"></div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast"></div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--  SCREEN: WELCOME / NAME LOGIN          -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-welcome" class="screen active">
+    <div class="screen-inner narrow">
+      <span class="hero-emoji">💧</span>
+      <h1>Stay <span class="gradient-text">Hydrated,</span> EJY!</h1>
+      <p class="hero-sub">Your smart, simple hydration companion.<br>No passwords. Just you and water.</p>
+
+      <div class="card mt-lg">
+        <div class="form-group">
+          <label class="label">What's your name?</label>
+          <input type="text" id="inp-name" placeholder="e.g. Christian" maxlength="30" autocomplete="off" />
+          <span class="field-hint" id="hint-name"></span>
+        </div>
+        <button class="btn btn-primary btn-full mt-md" id="btn-enter" onclick="App.enterName()">
+          Let's Go 💧
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--  SCREEN: SETUP (new user only)         -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-setup" class="screen">
+    <div class="screen-inner narrow">
+      <div class="card">
+        <h2>Set Your Goal 🎯</h2>
+        <p class="text-sm mt-xs">We'll calculate your recommended daily water intake.</p>
+
+        <div class="form-group mt-md">
+          <label class="label">Your Weight (kg)</label>
+          <input type="number" id="inp-weight" placeholder="e.g. 70" min="30" max="250" />
+        </div>
+
+        <div class="form-group mt-sm">
+          <label class="label">Activity Level</label>
+          <select id="inp-activity">
+            <option value="low">Low – mostly sitting</option>
+            <option value="moderate" selected>Moderate – light exercise</option>
+            <option value="high">High – intense workouts</option>
+          </select>
+        </div>
+
+        <div class="goal-preview mt-md" id="goal-preview" style="display:none">
+          <div class="label">Recommended Daily Goal</div>
+          <div class="goal-number" id="goal-display">—</div>
+          <div class="text-xs text-muted" id="goal-liters">—</div>
+        </div>
+
+        <div class="btn-row mt-md">
+          <button class="btn btn-ghost" onclick="App.previewGoal()">Calculate ↗</button>
+          <button class="btn btn-primary" onclick="App.saveSetup()">Start Tracking 💧</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--  SCREEN: MAIN DASHBOARD               -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="screen-main" class="screen" style="display:none">
+
+    <!-- PAGE: DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-inner">
+
+        <!-- Header -->
+        <div class="dash-header">
+          <div>
+            <div class="label">Welcome back</div>
+            <h2 id="greet-name"></h2>
+          </div>
+          <div class="score-ring" id="score-badge">0</div>
+        </div>
+
+        <!-- Ring + Stats -->
+        <div class="card card-ring">
+          <div class="ring-wrap">
+            <svg width="180" height="180" viewBox="0 0 180 180">
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00a8d6"/>
+                  <stop offset="50%" stop-color="#00d4ff"/>
+                  <stop offset="100%" stop-color="#00ffcc"/>
+                </linearGradient>
+              </defs>
+              <circle class="ring-bg" cx="90" cy="90" r="78" stroke-width="12"/>
+              <circle class="ring-fg" id="ring" cx="90" cy="90" r="78"
+                stroke-width="12" stroke-dasharray="490" stroke-dashoffset="490"/>
+            </svg>
+            <div class="ring-center">
+              <div class="ring-pct" id="ring-pct">0%</div>
+              <div class="ring-label">hydrated</div>
+            </div>
+          </div>
+
+          <div class="stat-trio">
+            <div class="stat-cell">
+              <div class="label">Goal</div>
+              <div class="stat-val" id="stat-goal">—</div>
+            </div>
+            <div class="stat-cell">
+              <div class="label">Consumed</div>
+              <div class="stat-val aqua" id="stat-consumed">0 mL</div>
+            </div>
+            <div class="stat-cell">
+              <div class="label">Remaining</div>
+              <div class="stat-val teal" id="stat-remaining">—</div>
+            </div>
+          </div>
+
+          <div class="bar-wrap">
+            <div class="bar-fill" id="progress-bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Compensation Alert -->
+        <div class="comp-alert" id="comp-alert">
+          💧 <span id="comp-msg"></span>
+        </div>
+
+        <!-- Quick Add -->
+        <div class="card card-sm">
+          <div class="label mb-sm">Quick Add Water</div>
+          <div class="quick-add-grid">
+            <button class="btn-add" onclick="App.addWater(250)">+250 mL</button>
+            <button class="btn-add" onclick="App.addWater(500)">+500 mL</button>
+            <button class="btn-add" onclick="App.addWater(750)">+750 mL</button>
+            <button class="btn-add" onclick="App.addWater(1000)">+1 L</button>
+          </div>
+          <div class="custom-add mt-sm">
+            <input type="number" id="custom-ml" placeholder="Custom amount (mL)" min="1" max="5000" />
+            <button class="btn btn-ghost btn-sm" onclick="App.addCustom()">Add</button>
+          </div>
+        </div>
+
+        <!-- Tip -->
+        <div class="card card-sm">
+          <div class="label mb-xs">💡 Hydration Tip</div>
+          <div class="tip-card" id="tip-text"></div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="card card-sm">
+          <div class="label mb-sm">Achievements</div>
+          <div class="ach-grid" id="ach-grid"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PAGE: BEVERAGES -->
+    <div id="page-beverages" class="page">
+      <div class="page-inner">
+        <h2 class="page-title">Beverages 🥤</h2>
+
+        <div class="card card-sm">
+          <div class="label mb-sm">Log a Beverage</div>
+          <div class="form-grid">
+            <select id="bev-type">
+              <option value="">Choose type…</option>
+              <option value="softdrink">🥤 Soft Drink</option>
+              <option value="coffee">☕ Coffee</option>
+              <option value="tea">🍵 Tea</option>
+              <option value="energy">⚡ Energy Drink</option>
+              <option value="alcohol">🍺 Alcohol</option>
+              <option value="juice">🍊 Juice</option>
+              <option value="milk">🥛 Milk</option>
+            </select>
+            <input type="number" id="bev-ml" placeholder="Amount (mL)" min="1" max="2000" />
+          </div>
+          <button class="btn btn-primary btn-full mt-sm" onclick="App.logBeverage()">Log Beverage</button>
+        </div>
+
+        <!-- Compensation alert inline -->
+        <div class="comp-alert" id="comp-alert-bev"></div>
+
+        <!-- Beverage Log -->
+        <div class="card card-sm">
+          <div class="label mb-sm">Today's Log</div>
+          <div class="bev-log" id="bev-log">
+            <div class="empty-state">No beverages logged yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: STATS -->
+    <div id="page-stats" class="page">
+      <div class="page-inner">
+        <h2 class="page-title">Statistics 📊</h2>
+
+        <!-- Summary Cards -->
+        <div class="mini-stat-grid">
+          <div class="mini-stat">
+            <div class="mini-stat-label">Water Today</div>
+            <div class="mini-stat-val aqua" id="ms-water">0 mL</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">Beverages</div>
+            <div class="mini-stat-val" id="ms-bevs">0</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">Extra Needed</div>
+            <div class="mini-stat-val warn" id="ms-extra">0 mL</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">Completion</div>
+            <div class="mini-stat-val teal" id="ms-pct">0%</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="card card-sm">
+          <div class="tab-bar">
+            <button class="tab active" data-tab="daily" onclick="App.switchTab(this,'daily')">Daily</button>
+            <button class="tab" data-tab="weekly" onclick="App.switchTab(this,'weekly')">Weekly</button>
+            <button class="tab" data-tab="monthly" onclick="App.switchTab(this,'monthly')">Monthly</button>
+          </div>
+          <div id="tab-daily" class="tab-pane active">
+            <div class="chart-wrap"><canvas id="chart-daily"></canvas></div>
+          </div>
+          <div id="tab-weekly" class="tab-pane">
+            <div class="chart-wrap"><canvas id="chart-weekly"></canvas></div>
+          </div>
+          <div id="tab-monthly" class="tab-pane">
+            <div class="chart-wrap"><canvas id="chart-monthly"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Streak -->
+        <div class="card card-sm streak-card">
+          <div class="streak-icon">🔥</div>
+          <div>
+            <div class="label">Current Streak</div>
+            <div class="streak-val"><span id="streak-val">0</span> days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: SETTINGS -->
+    <div id="page-settings" class="page">
+      <div class="page-inner">
+        <h2 class="page-title">Settings ⚙️</h2>
+
+        <!-- Reminders -->
+        <div class="card card-sm">
+          <div class="setting-row">
+            <div>
+              <div class="setting-title">Hydration Reminders</div>
+              <div class="text-xs text-muted" id="rem-status-label">Off</div>
+            </div>
+            <div class="toggle" id="rem-toggle" onclick="App.toggleReminders()"></div>
+          </div>
+          <div class="form-group mt-sm">
+            <label class="label">Reminder Interval</label>
+            <select id="rem-interval" onchange="App.changeInterval()">
+              <option value="30">Every 30 minutes</option>
+              <option value="60" selected>Every 1 hour</option>
+              <option value="120">Every 2 hours</option>
+              <option value="custom">Custom…</option>
+            </select>
+          </div>
+          <div id="rem-custom-wrap" style="display:none" class="form-group mt-sm">
+            <label class="label">Custom (minutes)</label>
+            <input type="number" id="rem-custom-min" placeholder="e.g. 45" min="5" max="480" />
+          </div>
+        </div>
+
+        <!-- Goal -->
+        <div class="card card-sm">
+          <div class="setting-title mb-sm">Update Daily Goal</div>
+          <div class="form-grid">
+            <input type="number" id="upd-weight" placeholder="Weight (kg)" />
+            <select id="upd-activity">
+              <option value="low">Low</option>
+              <option value="moderate" selected>Moderate</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <button class="btn btn-ghost btn-full mt-sm" onclick="App.updateGoal()">Recalculate Goal</button>
+        </div>
+
+        <!-- Sign Out -->
+        <div class="card card-sm">
+          <div class="setting-title mb-xs">Session</div>
+          <p class="text-xs text-muted mb-sm">Signing out will save your progress. Next time you enter your name, your history will be restored.</p>
+          <button class="btn btn-danger btn-full" onclick="App.signOut()">Sign Out</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /screen-main -->
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav" class="bottom-nav">
+    <button class="nav-item active" data-page="dashboard" onclick="App.navigate('dashboard', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="nav-item" data-page="beverages" onclick="App.navigate('beverages', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M5 3h14l-2 9a5 5 0 0 1-10 0L5 3z"/><line x1="3" y1="9" x2="21" y2="9"/>
+      </svg>
+      <span>Beverages</span>
+    </button>
+    <button class="nav-item" data-page="stats" onclick="App.navigate('stats', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/>
+        <line x1="16" y1="20" x2="16" y2="14"/><line x1="22" y1="20" x2="22" y2="7"/>
+      </svg>
+      <span>Stats</span>
+    </button>
+    <button class="nav-item" data-page="settings" onclick="App.navigate('settings', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
